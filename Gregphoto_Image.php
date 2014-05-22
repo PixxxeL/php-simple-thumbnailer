@@ -19,14 +19,18 @@ Class Gregphoto_Image {
 	protected $quality = 100;
 	
 	/**
-	 * fit in minimum dimension
+	 * fit in width (FIT_WIDTH | FIT_HEIGHT - full)
 	 */
-	const FIT = 1;
+	const FIT_WIDTH = 1;
+	/**
+	 * fit in height (FIT_WIDTH | FIT_HEIGHT - full)
+	 */
+	const FIT_HEIGHT = 2;
 	/**
 	 * fit and crop
 	 */
-	const CROP_FIT = 2;
-	const EXACT = 4;
+	const CROP_FIT = 4;
+	const EXACT = 8;
 	
 	/**
 	 * Constructor for the class, must be called
@@ -60,11 +64,13 @@ Class Gregphoto_Image {
 					$y = round(($nh - $this->maxHeight) / 2);
 				}
 				break;
-			case Gregphoto_Image::FIT:
-				if(($w / $h) > ($this->maxWidth / $this->maxHeight)) {
+			case Gregphoto_Image::FIT_WIDTH:
+			case Gregphoto_Image::FIT_HEIGHT:
+			case (Gregphoto_Image::FIT_WIDTH | Gregphoto_Image::FIT_HEIGHT):
+				if ($type == Gregphoto_Image::FIT_WIDTH || ($w / $h) > ($this->maxWidth / $this->maxHeight)) {
 					$nw = $this->maxWidth;
 					$nh = intval(($nw * $h) / $w);
-				} else {
+				} elseif ($type == Gregphoto_Image::FIT_HEIGHT || ($w / $h) <= ($this->maxWidth / $this->maxHeight)) {
 					$nh = $this->maxHeight;
 					$nw = intval(($nh * $w) / $h);
 				}
@@ -74,7 +80,7 @@ Class Gregphoto_Image {
 				$nh = $this->maxHeight;
 				break;
 			default:
-				throw new Gregphoto_Image_Exception("Resize type is not valid.  It must be one of the following class constants: Gregphoto_Image::FIT, Gregphoto_Image::CROP_FIT, Gregphoto_Image::EXACT");
+				throw new Gregphoto_Image_Exception("Resize type is not valid.  It must be one of the following class constants: Gregphoto_Image::FIT_WIDTH, Gregphoto_Image::FIT_HEIGHT, Gregphoto_Image::CROP_FIT, Gregphoto_Image::EXACT");
 		}
 		return array('width' => $nw, 'height' => $nh, 'x' => $x, 'y' => $y);
 	}
@@ -183,7 +189,7 @@ Class Gregphoto_Image {
 	/**
 	 * Resizes the image
 	 *
-	 * @param constant $type An image resize method.  Must be one of: Gregphoto_Image::FIT, Gregphoto_Image::CROP_FIT, Gregphoto_Image::EXACT
+	 * @param constant $type An image resize method.  Must be one of: Gregphoto_Image::FIT_WIDTH, Gregphoto_Image::FIT_HEIGHT, Gregphoto_Image::CROP_FIT, Gregphoto_Image::EXACT
 	 * @return Gregphoto_Image The Gregphoto_Image instance - used for 'fluent' access
 	 */
 	public function resize($type) {
@@ -197,7 +203,7 @@ Class Gregphoto_Image {
 			$dimensions['width'], $dimensions['height'], // dst dim
 			$this->getWidth(), $this->getHeight() // src dim
 		);
-		if(Gregphoto_Image::CROP_FIT) {
+		if($type == Gregphoto_Image::CROP_FIT) {
 			$this->thumb = $this->crop($this->thumb, $dimensions['x'], $dimensions['y']);
 		}
 		return $this;
