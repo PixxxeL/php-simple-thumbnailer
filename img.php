@@ -19,7 +19,7 @@ if ($type == 'orig') {
 } elseif ($type == 'fit') {
     $image->setMaxWidth(100);
     $image->setMaxHeight(100);
-    $image->resize(Gregphoto_Image::FIT);
+    $image->resize(Gregphoto_Image::FIT_WIDTH | Gregphoto_Image::FIT_HEIGHT);
     $image->showThumbnail();
 } elseif ($type == 'crop') {
     $image->setMaxWidth(270);

@@ -195,6 +195,8 @@ Class Gregphoto_Image {
 	public function resize($type) {
 		$dimensions = $this->getThumbnailParams($type);
 		$this->thumb = imagecreatetruecolor($dimensions['width'],$dimensions['height']);
+		@imagealphablending( $this->thumb, FALSE );
+		@imagesavealpha( $this->thumb, TRUE );
 		imagecopyresampled(
 			$this->thumb, // dst
 			$this->original, // src
@@ -211,6 +213,8 @@ Class Gregphoto_Image {
 
 	protected function crop($img, $x_offset, $y_offset) {
 		$this->croped_thumb = imagecreatetruecolor($this->maxWidth, $this->maxHeight);
+		@imagealphablending( $this->croped_thumb, FALSE );
+		@imagesavealpha( $this->croped_thumb, TRUE );
 		imagecopy(
 			$this->croped_thumb,
 			$img,
